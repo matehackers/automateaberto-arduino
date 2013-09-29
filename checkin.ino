@@ -9,7 +9,7 @@
 #include <EthernetUdp.h>
 #include <Time.h>
 
-const int CHAVE = 9;
+const int CHAVE = 7;
 const int LED_WARNING = 8; //LED avisando que o dispositivo nao esta executando
 int VALOR_PINO = 0;
 
@@ -24,7 +24,7 @@ EthernetClient client;
 
 //Variaveis para deteccao de presenca
 
-int segundosObservacao = 300; //segundos destinados a observacao de movimento
+int segundosObservacao = 100; //segundos destinados a observacao de movimento
 int minimoDeteccoes = 3; //valor minimo de deteccoes de presenca
 //variaveis para conexao ntp
 unsigned int localPort = 8888;      // porta local para receber a resposta do servidor NTP
@@ -192,6 +192,22 @@ void obtemHora(){
   
 }
 
+/*
+int lePinoRele(int pino){
+    //Leitura do rele necessita de um delay.
+    //Eh o que essa funcao faz.
+    int i;
+    
+    for(i=0;i<20;i++){      
+        if (digitalRead(pino) == HIGH)           
+           return HIGH;        
+        delay(10);
+    }
+    //digitalWrite(pino,LOW);
+    return LOW;     
+}*/
+
+
 void observa(int segundos) {
   int i;  
   const int DELAY = 1000; //sub-intervalo de observacao em ms
@@ -199,12 +215,15 @@ void observa(int segundos) {
   contador=0;  
   
   //observa, em intervaloes de 1s, durante o tempo fornecido
-  for(i=0;i<segundos*(1000/DELAY);i++){    
+  for(i=0;i<segundos*(1000/DELAY);i++){
+    pinMode(CHAVE,INPUT);
     VALOR_PINO = digitalRead(CHAVE);
+     pinMode(CHAVE,OUTPUT);
+    digitalWrite(CHAVE,LOW); 
     if (VALOR_PINO == LOW){
-      contador++; //presenca/deteccao: incrementa contador de presenca      
+      contador++; //presenca/deteccao: incrementa contador de presenca
     }
-    digitalWrite(CHAVE,LOW);
+     
     Serial.println(contador);  
     delay(DELAY);
   }
@@ -220,8 +239,8 @@ void piscaLedWarning(){
 void setup(){
   
   int i=0;
+  
   pinMode(CHAVE,INPUT);
-  pinMode(CHAVE,OUTPUT); //apos leitura seta low.
   pinMode(LED_WARNING,OUTPUT); 
   
   
