@@ -2,6 +2,7 @@
   Matehackers (matehackers.org)
   Automateaberto-arduino
   Testado sobre arduino uno e duemilanove.
+  Chave: Pino 7 digital e VCC
 */
 
 #include <SPI.h>
@@ -10,8 +11,10 @@
 #include <Time.h>
 
 const int CHAVE = 7;
+//O outro lado da chave eh ligada no ground
 const int LED_WARNING = 8; //LED avisando que o dispositivo nao esta executando
 int VALOR_PINO = 0;
+
 
 //Variaveis para conexao com o mateaberto.herokuapp.com
 byte mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
@@ -24,14 +27,14 @@ EthernetClient client;
 
 //Variaveis para deteccao de presenca
 
-int segundosObservacao = 100; //segundos destinados a observacao de movimento
+int segundosObservacao = 300; //segundos destinados a observacao de movimento
 int minimoDeteccoes = 3; //valor minimo de deteccoes de presenca
 //variaveis para conexao ntp
 unsigned int localPort = 8888;      // porta local para receber a resposta do servidor NTP
 IPAddress timeServer(200, 160, 7, 186); // time.nist.gov NTP server
 const int NTP_PACKET_SIZE= 48; // timestamp do NTP encontra-se nos primeiros 48 bytes da mensagem
 byte packetBuffer[ NTP_PACKET_SIZE]; //buffer de entrada e saida dos pacotes
-int Timezone = -3;
+int Timezone = -2;
 EthernetUDP Udp; //envio de dados udp
 
 int ano;
@@ -71,6 +74,15 @@ void post(){
     Serial.println();
     client.write((uint8_t*)messageBuffer,BUFFER_SIZE);
     client.println();
+    /*
+    char c;
+    while(client.available()){
+
+      c=client.read();
+      Serial.print(c);
+      
+    }*/
+    
   } 
   else {
     //Serial.println("falha na conexao");
